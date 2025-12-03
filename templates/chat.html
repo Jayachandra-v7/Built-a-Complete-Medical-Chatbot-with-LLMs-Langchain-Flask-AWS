@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical Chatbot</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <div class="container">
+        <h2>🩺 Medical Chatbot</h2>
+
+        <div id="chat-box" class="chat-box"></div>
+
+        <div class="input-area">
+            <input 
+                type="text" 
+                id="userInput" 
+                placeholder="Type your message..." 
+                onkeydown="if(event.key==='Enter') sendMessage()"
+            >
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+<script>
+async function sendMessage() {
+
+    let message = document.getElementById("userInput").value;
+    if (message.trim() === "") return;
+
+    let chatBox = document.getElementById("chat-box");
+
+    // Display user message
+    chatBox.innerHTML += `<div class='user-msg'>You: ${message}</div>`;
+    document.getElementById("userInput").value = "";
+
+    // Prepare form-data for Flask
+    const formData = new FormData();
+    formData.append("msg", message);
+
+    // Send request to /get
+    const response = await fetch("/get", {
+        method: "POST",
+        body: formData
+    });
+
+    const botReply = await response.text();
+
+    // Display bot response
+    chatBox.innerHTML += `<div class='bot-msg'>Bot: ${botReply}</div>`;
+
+    // Auto scroll to bottom
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+</script>
+
+</body>
+</html>
